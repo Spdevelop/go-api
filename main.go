@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -24,7 +25,8 @@ type Employee struct {
 var collection *mongo.Collection
 
 func connectDB() {
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://<user>:<pass>@cluster.mongodb.net/mydb"))
+	mongoURI := os.Getenv("MONGODB_URI")
+	client, err := mongo.NewClient(options.Client().ApplyURI(mongoURI))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,10 +37,11 @@ func connectDB() {
 		log.Fatal(err)
 	}
 
-	collection = client.Database("mydb").Collection("employees")
+	collection = client.Database("DB_9supat").Collection("employees")
 }
 
 func getEmployees(c *gin.Context) {
+	fmt.Println("getEmployees")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
