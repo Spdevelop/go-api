@@ -3,13 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
+    "os"
+    "log"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -24,9 +25,17 @@ type Employee struct {
 
 var collection *mongo.Collection
 
+func init() {
+    err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file")
+    }
+}
+
 func connectDB() {
-	mongoURI := os.Getenv("MONGODB_URI")
-	client, err := mongo.NewClient(options.Client().ApplyURI(mongoURI))
+	fmt.Println("MONGO URI:", os.Getenv("MONGODB_URI"))
+	client, err := mongo.NewClient(options.Client().ApplyURI(os.Getenv("MONGODB_URI")))
+	
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -101,7 +110,7 @@ func deleteEmployee(c *gin.Context) {
 
 func main() {
 	connectDB()
-
+	
 	r := gin.Default()
 	r.GET("/employees", getEmployees)
 	r.POST("/employees", createEmployee)
